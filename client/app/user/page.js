@@ -1,119 +1,8 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Modal from 'react-modal';
-
-let data = [
-  {
-    id: 1,
-    username: "alex_smith",
-    fullName: "Alex Smith",
-    email: "alex.smith@email.com",
-    gender: "Male",
-    yearOfBirth: 1992,
-    numberOfTasks: 10
-  },
-  {
-    id: 2,
-    username: "sarah_jones",
-    fullName: "Sarah Jones",
-    email: "sarah.jones@email.com",
-    gender: "Female",
-    yearOfBirth: 1988,
-    numberOfTasks: 0
-  },
-  {
-    id: 3,
-    username: "mike_chen",
-    fullName: "Michael Chen",
-    email: "mike.chen@email.com",
-    gender: "Male",
-    yearOfBirth: 1995,
-    numberOfTasks: 0
-  },
-  {
-    id: 4,
-    username: "emma_davis",
-    fullName: "Emma Davis",
-    email: "emma.davis@email.com",
-    gender: "Female",
-    yearOfBirth: 1990,
-    numberOfTasks: 0
-  },
-  {
-    id: 5,
-    username: "david_wilson",
-    fullName: "David Wilson",
-    email: "david.wilson@email.com",
-    gender: "Male",
-    yearOfBirth: 1987,
-    numberOfTasks: 0
-  },
-  {
-    id: 6,
-    username: "lisa_brown",
-    fullName: "Lisa Brown",
-    email: "lisa.brown@email.com",
-    gender: "Female",
-    yearOfBirth: 1993,
-    numberOfTasks: 0
-  },
-  {
-    id: 7,
-    username: "james_taylor",
-    fullName: "James Taylor",
-    email: "james.taylor@email.com",
-    gender: "Male",
-    yearOfBirth: 1985,
-    numberOfTasks: 0
-  },
-  {
-    id: 8,
-    username: "anna_garcia",
-    fullName: "Anna Garcia",
-    email: "anna.garcia@email.com",
-    gender: "Female",
-    yearOfBirth: 1996,
-    numberOfTasks: 0
-  },
-  {
-    id: 9,
-    username: "chris_martin",
-    fullName: "Christopher Martin",
-    email: "chris.martin@email.com",
-    gender: "Male",
-    yearOfBirth: 1991,
-    numberOfTasks: 0
-  },
-  {
-    id: 10,
-    username: "sophia_lee",
-    fullName: "Sophia Lee",
-    email: "sophia.lee@email.com",
-    gender: "Female",
-    yearOfBirth: 1994,
-    numberOfTasks: 0
-  },
-  {
-    id: 11,
-    username: "ryan_white",
-    fullName: "Ryan White",
-    email: "ryan.white@email.com",
-    gender: "Male",
-    yearOfBirth: 1989,
-    numberOfTasks: 0
-  },
-  {
-    id: 12,
-    username: "maya_patel",
-    fullName: "Maya Patel",
-    email: "maya.patel@email.com",
-    gender: "Female",
-    yearOfBirth: 1997,
-    numberOfTasks: 0
-  }
-];
 
 const customStyles = {
   overlay: {
@@ -140,7 +29,8 @@ const customStyles = {
 export default function UserRoute() {
   Modal.setAppElement('body');
 
-  const [users, setUsers] = useState(data);
+  const currentYear = new Date().getFullYear();
+  const [users, setUsers] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newUser, setNewUser] = useState({
@@ -151,7 +41,7 @@ export default function UserRoute() {
     yearOfBirth: new Date().getFullYear() - 25
   });
   const [editUser, setEditUser] = useState({
-    id: null,
+    _id: null,
     fullName: '',
     username: '',
     email: '',
@@ -160,7 +50,21 @@ export default function UserRoute() {
     numberOfTasks: 0
   });
 
-  const currentYear = new Date().getFullYear();
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("http://localhost:3001/users", { 
+        method: 'GET' 
+      });
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching Task items:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   // Add User Modal Functions
   const handleOpenAddModal = () => {
@@ -187,7 +91,7 @@ export default function UserRoute() {
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setEditUser({
-      id: null,
+      _id: null,
       fullName: '',
       username: '',
       email: '',
@@ -213,29 +117,50 @@ export default function UserRoute() {
     }));
   };
 
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
 
-    const newUserData = {
-      id: Math.max(...users.map(u => u.id)) + 1,
-      ...newUser,
-      numberOfTasks: 0
-    };
+    try {
+      const response = await fetch("http://localhost:3001/users", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newUser,
+          numberOfTasks: 0
+        })
+      });
+      const data = await response.json();
+      console.log("Item added:", data);
 
-    setUsers([...users, newUserData]);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error adding User:", error);
+    }
+
     handleCloseAddModal();
   };
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    setUsers(users.map(user => 
-      user.id === editUser.id ? editUser : user
-    ));
+    try {
+      const response = await fetch("http://localhost:3001/users/" + editUser._id, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editUser)
+      });
+      const data = await response.json();
+      console.log("Item edited:", data);
+
+      fetchUsers();
+    } catch (error) {
+      console.error("Error editing User:", error);
+    }
+
     handleCloseEditModal();
   };
 
-  const handleDeleteUser = (userId, userName, numberOfTasks) => {
+  const handleDeleteUser = async (userId, userName, numberOfTasks) => {
     if(numberOfTasks > 0) {
       alert(`Cannot delete ${userName} because they have tasks assigned.`);
       return;
@@ -244,7 +169,17 @@ export default function UserRoute() {
     const confirmDelete = confirm(`Are you sure you want to delete ${userName}?`);
     
     if (confirmDelete) {
-      setUsers(users.filter(user => user.id !== userId));
+      try {
+        const response = await fetch("http://localhost:3001/users/" + userId, {
+          method: 'DELETE'
+        });
+        const data = await response.json();
+        console.log("Item deleted:", data);
+
+        fetchUsers();
+      } catch (error) {
+        console.error("Error deleting User:", error);
+      }
     }
   };
 
@@ -445,8 +380,8 @@ export default function UserRoute() {
           </thead>
           <tbody className={styles.tbody}>
             {users.map((item, index) => (
-              <tr key={item.id} className={styles.tr}>
-                <td className={styles.td}>{item.id}</td>
+              <tr key={item._id} className={styles.tr}>
+                <td className={styles.td}>{index + 1}</td>
                 <td className={styles.td}>{item.fullName}</td>
                 <td className={styles.td}>{item.username}</td>
                 <td className={styles.td}>{item.email}</td>
@@ -471,7 +406,7 @@ export default function UserRoute() {
                     </button>
                     <button 
                       className={styles.deleteButton}
-                      onClick={() => handleDeleteUser(item.id, item.fullName, item.numberOfTasks)}
+                      onClick={() => handleDeleteUser(item._id, item.fullName, item.numberOfTasks)}
                     >
                       Delete
                     </button>

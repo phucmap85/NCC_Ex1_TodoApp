@@ -4,36 +4,72 @@ import React, { useState } from "react";
 import styles from "./box.module.css";
 import Item from "../item/item.js";
 
-export default function Box({ text }) {
-  const [items, setItems] = useState([
-    { id: 1, name: "Learn React", status: "", assignees: [] },
-    { id: 2, name: "Build a todo app", status: "", assignees: [] },
-    { id: 3, name: "Deploy to production", status: "", assignees: [] }
-  ]);
+export default function Box({ text, items, onChange }) {
   const [newItemText, setNewItemText] = useState("");
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (newItemText.trim() === "") return;
     
-    const newItem = { 
-      id: Date.now(),
-      name: newItemText.trim(), 
-      status: text.toLowerCase(),
-      assignees: []
-    };
-    setItems([...items, newItem]);
-    setNewItemText("");
+    try {
+      const response = await fetch("http://localhost:3001/tasks", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newItemText.trim(), 
+          status: text.toLowerCase(),
+          assignees: []
+        })
+      });
+      const data = await response.json();
+      console.log("Item added:", data);
+
+      setNewItemText("");
+
+      onChange(text);
+    } catch (error) {
+      console.error("Error adding Task item:", error);
+    }
   };
 
-  const handleDeleteItem = (id) => {
-    setItems(items.filter(item => item.id !== id));
+  const handleDeleteItem = async (id) => {
+    try {
+      const response = await fetch("http://localhost:3001/tasks/" + id, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      console.log("Item deleted:", data);
+
+      onChange(text);
+    } catch (error) {
+      console.error("Error delete Task item:", error);
+    }
   };
 
-  const handleEditItem = (id, name, assignees, status) => {
+  const handleEditItem = async (id, name, assignees, status) => {
     if (name.trim() === "") return;
-    setItems(items.map(item =>
-      item.id === id ? { ...item, name: name.trim(), assignees: assignees, status: status } : item
-    ));
+
+    const editItem = {
+      name: name.trim(), 
+      assignee: assignees, 
+      status: status.toLowerCase()
+    }
+
+    console.log("Editing item:", JSON.stringify(editItem));
+
+    try {
+      const response = await fetch("http://localhost:3001/tasks/" + id, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editItem)
+      });
+      const data = await response.json();
+      console.log("Item updated:", data);
+      
+      onChange(text);
+      onChange(status);
+    } catch (error) {
+      console.error("Error adding Task item:", error);
+    }
   };
 
   return (
@@ -63,7 +99,7 @@ export default function Box({ text }) {
         ) : (
           items.map(item => (
             <Item
-              key={item.id}
+              key={item._id}
               item={item}
               onDelete={handleDeleteItem}
               onEdit={handleEditItem}

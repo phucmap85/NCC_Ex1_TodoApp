@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./item.module.css";
 import { MdEdit, MdDelete } from "react-icons/md";
 import Modal from 'react-modal';
@@ -31,20 +31,28 @@ export default function Item({ item, onDelete, onEdit }) {
   Modal.setAppElement('body');
 
   const [name, setName] = useState(item.name || "");
-  const [assignees, setAssignees] = useState(item.assignees || []);
   const [taskStatus, setTaskStatus] = useState(item.status || "todo");
+  const [assignee, setAssignee] = useState(item.assignee || []);
 
   const [modalIsOpen, setIsOpen] = useState(false);
 
-  const users = [
-    "John Doe", 
-    "Jane Smith", 
-    "Mike Johnson", 
-    "Sarah Wilson", 
-    "David Brown",
-    "Alex Chen",
-    "Emma Davis"
-  ];
+  const [users, setUsers] = useState([]);
+  
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/users", { method: 'GET' });
+        const data = await response.json();
+        setUsers(data);
+
+        console.log("Fetched Users:", data);
+      } catch (error) {
+        console.error("Error fetching Users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const statusOptions = [
     { value: "todo", label: "Todo", color: "#ebe700ff" },
@@ -54,24 +62,26 @@ export default function Item({ item, onDelete, onEdit }) {
 
   const handleEdit = () => {
     setName(item.name || "");
-    setAssignees(item.assignees || []);
+    setAssignee(item.assignee || []);
     setTaskStatus(item.status || "todo");
     setIsOpen(true);
   };
 
   const handleDelete = () => {
-    if(confirm("Do you want to delete this item?")) onDelete(item.id);
+    if(confirm("Do you want to delete this item?")) onDelete(item._id);
   }
 
-  const handleUserToggle = (user) => {
-    setAssignees(prev => {
-      if (prev.includes(user)) return prev.filter(u => u !== user);
+  const handleAssignee = (user) => {
+    setAssignee(prev => {
+      if (prev.map(tempPrev => tempPrev._id).includes(user._id)) {
+        return prev.filter(u => u._id !== user._id);
+      }
       else return [...prev, user];
     });
   };
 
   const handleSave = () => {
-    onEdit(item.id, name, assignees, taskStatus);
+    onEdit(item._id, name, assignee, taskStatus);
     setIsOpen(false);
   };
 
@@ -144,25 +154,31 @@ export default function Item({ item, onDelete, onEdit }) {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="assignees" className={styles.label}>
-                Assign To ({assignees.length} selected)
+              <label htmlFor="assignee" className={styles.label}>
+                Assign To ({assignee.length} selected)
               </label>
               <div className={styles.userSelectionGrid}>
                 {users.map(user => (
-                  <label key={user} className={styles.userCheckboxLabel}>
+                  <label key={user.fullName} className={styles.userCheckboxLabel}>
                     <input
                       type="checkbox"
-                      checked={assignees.includes(user)}
-                      onChange={() => handleUserToggle(user)}
+                      checked={assignee.map(tempAssignee => tempAssignee._id).includes(user._id)}
+                      onChange={() => handleAssignee(user)}
                       className={styles.userCheckbox}
                     />
-                    <span className={styles.userCheckboxText}>{user}</span>
+                    <span className={styles.userCheckboxText}>{user.fullName}</span>
                   </label>
                 ))}
               </div>
-              {assignees.length > 0 && (
+              {assignee.length > 0 && (
                 <div className={styles.selectedUsers}>
-                  <strong>Selected:</strong> {assignees.join(", ")}
+                  <strong>Selected: </strong> 
+                  {assignee.map((user, index) => (
+                    <span key={user._id} className={styles.selectedUser}>
+                      {index > 0 && ", "}
+                      {user.fullName}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
@@ -187,16 +203,14 @@ export default function Item({ item, onDelete, onEdit }) {
       </Modal>
       <div className={styles.textContainer}>
         <span className={styles.incomplete}>
-          {item.name}
+          <strong>{item.name}</strong>
 
-          {item.assignees && item.assignees.length > 0 && (
-            <div className={styles.assignees}>
-              <span className={styles.assignees}>Assigned to:</span>
+          {item.assignee && item.assignee.length > 0 && (
+            <div className={styles.assignee}>
+              <span className={styles.assignee}>Assigned to:</span>
               <div className={styles.userTags}>
-                {item.assignees.map(user => (
-                  <span key={user} className={styles.userTag}>
-                    {user}
-                  </span>
+                {item.assignee.map((user) => (
+                  <span key={user._id} className={styles.userTag}>{user.fullName}</span>
                 ))}
               </div>
             </div>
