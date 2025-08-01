@@ -13,6 +13,11 @@ export class TasksController {
     return this.tasksService.findAll();
   }
 
+  @Get(':task')
+  findByTask(@Param('task') task: string): Promise<Task[]> {
+    return this.tasksService.findByTask(task);
+  }
+
   @Post()
   create(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);

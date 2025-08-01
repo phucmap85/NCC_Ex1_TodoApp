@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { User } from 'src/users/schemas/user.schema';
 
-export type UserDocument = HydratedDocument<Task>;
+export type TaskDocument = HydratedDocument<Task>;
 
 @Schema()
 export class Task {
@@ -11,8 +12,8 @@ export class Task {
   @Prop()
   status: string;
 
-  @Prop([String])
-  assignee: string[];
+  @Prop([User])
+  assignee: User[];
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
