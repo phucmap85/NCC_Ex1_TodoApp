@@ -13,6 +13,17 @@ export class TasksService {
 
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
     const createdTask = await this.taskModel.create(createTaskDto);
+    
+    if(createdTask && (createdTask['status'] === "doing" || createdTask['status'] === "todo")) {
+      createdTask['assignee'].forEach((user: User) => {
+        this.userModel.findByIdAndUpdate(
+          { _id: user._id },
+          { $inc: { numberOfTasks: 1 } },
+          { new: true }
+        ).exec();
+      });
+    }
+
     return createdTask;
   }
 
@@ -36,13 +47,16 @@ export class TasksService {
     };
 
     if(existingTask) {
-      if(existingTask['status'] === "doing" && (updateTaskDto['status'] === "done" || updateTaskDto['status'] === "todo")) {
+      if((existingTask['status'] === "doing" || existingTask['status'] === "todo") && 
+          updateTaskDto['status'] === "done") {
         existingTask['assignee'].forEach((user: User) => updateNumberOfTasks(user._id, -1));
       } 
-      else if(existingTask['status'] !== "doing" && updateTaskDto['status'] === "doing") {
+      else if(existingTask['status'] === "done" && 
+             (updateTaskDto['status'] === "doing" || updateTaskDto['status'] === "todo")) {
         updateTaskDto['assignee'].forEach((user: User) => updateNumberOfTasks(user._id, 1));
       } 
-      else if(existingTask['status'] === "doing" && updateTaskDto['status'] === "doing") {
+      else if((existingTask['status'] === "doing" || existingTask['status'] === "todo") && 
+              (updateTaskDto['status'] === "doing" || updateTaskDto['status'] === "todo")) {
         existingTask['assignee'].forEach((user: User) => updateNumberOfTasks(user._id, -1));
         updateTaskDto['assignee'].forEach((user: User) => updateNumberOfTasks(user._id, 1));
       }
@@ -57,7 +71,7 @@ export class TasksService {
     const deletedTask = await this.taskModel.findById({ _id: id }).exec();
 
     if(deletedTask) {
-      if(deletedTask['status'] === "doing") {
+      if(deletedTask['status'] === "doing" || deletedTask['status'] === "todo") {
         deletedTask['assignee'].forEach((user: User) => {
           this.userModel.findByIdAndUpdate(
             { _id: user._id },
