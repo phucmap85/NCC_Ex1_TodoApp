@@ -5,3 +5,283 @@
   font-family: var(--font-geist-sans);
   display: flex;
 }
+
+/* Modal Styles */
+.modalContent {
+  max-width: 500px;
+  min-width: 400px;
+  max-height: 500px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.modalCloseButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modalCloseButton:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.modalBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  /* min-height: 0; */
+}
+
+.modalBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalBody::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.modalBody::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-bottom: 1rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modalTextarea {
+  padding: 0.6rem;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  max-height: 100px;
+  transition: border-color 0.2s ease;
+}
+
+.modalTextarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.modalFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.modalSaveButton,
+.modalCancelButton {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.modalSaveButton {
+  background: #27ae60;
+  color: white;
+}
+
+.modalSaveButton:hover:not(:disabled) {
+  background: #229954;
+  transform: translateY(-1px);
+}
+
+.modalSaveButton:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.modalCancelButton {
+  background: #6c757d;
+  color: white;
+}
+
+.modalCancelButton:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.userSelectionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.userSelectionGrid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.userSelectionGrid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.userSelectionGrid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.userCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.userCheckboxLabel:hover {
+  background: #e9ecef;
+}
+
+.userCheckbox {
+  width: 14px;
+  height: 14px;
+  accent-color: #3498db;
+  cursor: pointer;
+}
+
+.userCheckboxText {
+  font-size: 0.85rem;
+  color: #2c3e50;
+  font-weight: 500;
+  user-select: none;
+}
+
+.selectedUsers {
+  max-width: 400px;
+  padding: 0.6rem;
+  background: #e8f5e8;
+  border-radius: 4px;
+  border: 1px solid #c8e6c9;
+  font-size: 0.8rem;
+  color: #2e7d32;
+  margin-top: 0.4rem;
+  max-height: 60px;
+  overflow-y: auto;
+}
+
+.selectedUsers strong {
+  color: #1b5e20;
+}
+
+.statusGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.statusOption {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.statusRadio {
+  margin-right: 0.75rem;
+  accent-color: #3498db;
+  cursor: pointer;
+}
+
+.statusLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.statusOption:hover .statusLabel {
+  background: #e9ecef;
+}
+
+.statusOption input:checked + .statusLabel {
+  background: rgba(52, 152, 219, 0.1);
+  border-color: #3498db;
+}
+
+.statusIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

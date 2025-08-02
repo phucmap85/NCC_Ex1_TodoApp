@@ -44,8 +44,6 @@ export default function Item({ item, onDelete, onEdit }) {
         const response = await fetch("http://localhost:3001/users", { method: 'GET' });
         const data = await response.json();
         setUsers(data);
-
-        console.log("Fetched Users:", data);
       } catch (error) {
         console.error("Error fetching Users:", error);
       }
@@ -118,7 +116,7 @@ export default function Item({ item, onDelete, onEdit }) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={styles.modalTextarea}
-                placeholder="Enter task description..."
+                placeholder="Enter task name..."
                 rows={3}
               />
             </div>
@@ -159,7 +157,7 @@ export default function Item({ item, onDelete, onEdit }) {
               </label>
               <div className={styles.userSelectionGrid}>
                 {users.map(user => (
-                  <label key={user.fullName} className={styles.userCheckboxLabel}>
+                  <label key={user._id} className={styles.userCheckboxLabel}>
                     <input
                       type="checkbox"
                       checked={assignee.map(tempAssignee => tempAssignee._id).includes(user._id)}

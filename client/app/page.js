@@ -7,10 +7,10 @@ export default function Main() {
     <div className={styles.container}>
       <h1>Todo App</h1>
       <nav className={styles.nav}>
-        <Link href="/task" className={styles.link}>
+        <Link href="/task" className={styles.link} target="_blank">
           Task Management
         </Link>
-        <Link href="/user" className={styles.link}>
+        <Link href="/user" className={styles.link} target="_blank">
           User Management
         </Link>
       </nav>

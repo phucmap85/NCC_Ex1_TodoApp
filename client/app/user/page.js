@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Modal from 'react-modal';
+import { GrUpdate } from "react-icons/gr";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const customStyles = {
   overlay: {
@@ -24,6 +27,17 @@ const customStyles = {
     maxHeight: '85vh',
     overflow: 'auto'
   }
+};
+
+const toastStyles = {
+  position: "bottom-right",
+  autoClose: 2000,
+  hideProgressBar: false,
+  closeOnClick: false,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
 };
 
 export default function UserRoute() {
@@ -58,7 +72,16 @@ export default function UserRoute() {
       const data = await response.json();
       setUsers(data);
     } catch (error) {
-      console.error("Error fetching Task items:", error);
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const updateUsers = () => {
+    try {
+      fetchUsers();
+      toast.success('Users updated successfully!', toastStyles);
+    } catch (error) {
+      console.error("Error updating users:", error);
     }
   };
 
@@ -375,7 +398,18 @@ export default function UserRoute() {
               <th className={styles.th}>Gender</th>
               <th className={styles.th}>Age</th>
               <th className={styles.th}>Tasks</th>
-              <th className={styles.th}>Actions</th>
+              <th className={styles.th}>
+                <div className={styles.actionsHeader}>
+                  <span>Actions</span>
+                  <button 
+                    className={styles.updateIconButton}
+                    onClick={updateUsers}
+                    title="Update users list"
+                  >
+                    <GrUpdate />
+                  </button>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className={styles.tbody}>
@@ -417,6 +451,8 @@ export default function UserRoute() {
           </tbody>
         </table>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

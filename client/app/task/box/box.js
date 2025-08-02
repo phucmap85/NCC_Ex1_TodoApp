@@ -1,36 +1,10 @@
 'use client'
 
-import React, { useState } from "react";
+import React from "react";
 import styles from "./box.module.css";
 import Item from "../item/item.js";
 
 export default function Box({ text, items, onChange }) {
-  const [newItemText, setNewItemText] = useState("");
-
-  const handleAddItem = async () => {
-    if (newItemText.trim() === "") return;
-    
-    try {
-      const response = await fetch("http://localhost:3001/tasks", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newItemText.trim(), 
-          status: text.toLowerCase(),
-          assignees: []
-        })
-      });
-      const data = await response.json();
-      console.log("Item added:", data);
-
-      setNewItemText("");
-
-      onChange(text);
-    } catch (error) {
-      console.error("Error adding Task item:", error);
-    }
-  };
-
   const handleDeleteItem = async (id) => {
     try {
       const response = await fetch("http://localhost:3001/tasks/" + id, {
@@ -75,23 +49,6 @@ export default function Box({ text, items, onChange }) {
   return (
     <div className={styles.board}>
       <h1 className={styles.title}>{text}</h1>
-
-      <div className={styles.addSection}>
-        <input
-          type="text"
-          value={newItemText}
-          onChange={(e) => setNewItemText(e.target.value)}
-          placeholder="Add new item..."
-          className={styles.input}
-        />
-        <button 
-          onClick={handleAddItem} 
-          className={styles.addButton}
-          disabled={newItemText.trim() === ""}
-        >
-          + Add
-        </button>
-      </div>
 
       <div className={styles.todoList}>
         {items.length === 0 ? (
