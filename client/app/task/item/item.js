@@ -42,15 +42,21 @@ export default function Item({ item, onDelete, onEdit }) {
     const fetchUsers = async () => {
       try {
         const response = await fetch("http://localhost:3001/users", { method: 'GET' });
+        
+        if(!response.ok) {
+          const errorText = await response.json();
+          throw new Error(errorText.message);
+        }
+        
         const data = await response.json();
         setUsers(data);
       } catch (error) {
-        console.error("Error fetching Users:", error);
+        console.error("Error fetching users:", error);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [modalIsOpen]);
 
   const statusOptions = [
     { value: "todo", label: "Todo", color: "#ebe700ff" },

@@ -3,6 +3,19 @@
 import React from "react";
 import styles from "./box.module.css";
 import Item from "../item/item.js";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const toastStyles = {
+  position: "bottom-right",
+  autoClose: 2000,
+  hideProgressBar: false,
+  closeOnClick: false,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "dark",
+};
 
 export default function Box({ text, items, onChange }) {
   const handleDeleteItem = async (id) => {
@@ -10,12 +23,18 @@ export default function Box({ text, items, onChange }) {
       const response = await fetch("http://localhost:3001/tasks/" + id, {
         method: 'DELETE'
       });
+
+      if(!response.ok) {
+        const errorText = await response.json();
+        throw new Error(errorText.message);
+      }
+
       const data = await response.json();
       console.log("Item deleted:", data);
 
       onChange(text);
     } catch (error) {
-      console.error("Error delete Task item:", error);
+      toast.error(error.message, toastStyles);
     }
   };
 
@@ -36,13 +55,19 @@ export default function Box({ text, items, onChange }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editItem)
       });
+
+      if(!response.ok) {
+        const errorText = await response.json();
+        throw new Error(errorText.message);
+      }
+
       const data = await response.json();
       console.log("Item updated:", data);
       
       onChange(text);
       onChange(status);
     } catch (error) {
-      console.error("Error adding Task item:", error);
+      toast.error(error.message, toastStyles);
     }
   };
 

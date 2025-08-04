@@ -79,7 +79,7 @@ export default function UserRoute() {
     };
 
     fetchUsers();
-  }, []);
+  }, [modalOpen]);
 
   const fetchItems = async (text) => {
     try {

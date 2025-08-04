@@ -51,7 +51,7 @@ export default function UserRoute() {
     fullName: '',
     username: '',
     email: '',
-    gender: 'Male',
+    gender: 'male',
     yearOfBirth: new Date().getFullYear() - 25
   });
   const [editUser, setEditUser] = useState({
@@ -59,7 +59,7 @@ export default function UserRoute() {
     fullName: '',
     username: '',
     email: '',
-    gender: 'Male',
+    gender: 'male',
     yearOfBirth: new Date().getFullYear() - 25,
     numberOfTasks: 0
   });
@@ -69,25 +69,29 @@ export default function UserRoute() {
       const response = await fetch("http://localhost:3001/users", { 
         method: 'GET' 
       });
+
+      if(!response.ok) {
+        const errorText = await response.json();
+        throw new Error(errorText.message);
+      }
+
       const data = await response.json();
       setUsers(data);
+
+      return 1;
     } catch (error) {
-      console.error("Error fetching users:", error);
+      toast.error(error.message, toastStyles);
+      return -1;
     }
   };
 
-  const updateUsers = () => {
-    try {
-      fetchUsers();
-      toast.success('Users updated successfully!', toastStyles);
-    } catch (error) {
-      console.error("Error updating users:", error);
-    }
+  const updateUsers = async () => {
+    const response = await fetchUsers();
+    
+    if(response >= 0) toast.success('Users updated successfully!', toastStyles);
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => {fetchUsers()}, []);
 
   // Add User Modal Functions
   const handleOpenAddModal = () => {
@@ -100,7 +104,7 @@ export default function UserRoute() {
       fullName: '',
       username: '',
       email: '',
-      gender: 'Male',
+      gender: 'male',
       yearOfBirth: new Date().getFullYear() - 25
     });
   };
@@ -118,7 +122,7 @@ export default function UserRoute() {
       fullName: '',
       username: '',
       email: '',
-      gender: 'Male',
+      gender: 'male',
       yearOfBirth: new Date().getFullYear() - 25,
       numberOfTasks: 0
     });
@@ -152,12 +156,18 @@ export default function UserRoute() {
           numberOfTasks: 0
         })
       });
+
+      if(!response.ok) {
+        const errorText = await response.json();
+        throw new Error(errorText.message);
+      }
+
       const data = await response.json();
       console.log("Item added:", data);
 
       fetchUsers();
     } catch (error) {
-      console.error("Error adding User:", error);
+      toast.error(error.message, toastStyles);
     }
 
     handleCloseAddModal();
@@ -172,12 +182,18 @@ export default function UserRoute() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editUser)
       });
+
+      if(!response.ok) {
+        const errorText = await response.json();
+        throw new Error(errorText.message);
+      }
+
       const data = await response.json();
       console.log("Item edited:", data);
 
       fetchUsers();
     } catch (error) {
-      console.error("Error editing User:", error);
+      toast.error(error.message, toastStyles);
     }
 
     handleCloseEditModal();
@@ -185,7 +201,7 @@ export default function UserRoute() {
 
   const handleDeleteUser = async (userId, userName, numberOfTasks) => {
     if(numberOfTasks > 0) {
-      alert(`Cannot delete ${userName} because they have tasks assigned.`);
+      toast.error(`Cannot delete ${userName} because they have tasks assigned`, toastStyles);
       return;
     }
 
@@ -196,12 +212,18 @@ export default function UserRoute() {
         const response = await fetch("http://localhost:3001/users/" + userId, {
           method: 'DELETE'
         });
+
+        if(!response.ok) {
+          const errorText = await response.json();
+          throw new Error(errorText.message);
+        }
+
         const data = await response.json();
         console.log("Item deleted:", data);
 
         fetchUsers();
       } catch (error) {
-        console.error("Error deleting User:", error);
+        toast.error(error.message, toastStyles);
       }
     }
   };
@@ -271,8 +293,8 @@ export default function UserRoute() {
                 onChange={handleAddInputChange}
                 className={styles.formSelect}
               >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
               </select>
             </div>
             <div className={styles.formGroup}>
@@ -283,7 +305,7 @@ export default function UserRoute() {
                 name="yearOfBirth"
                 value={newUser.yearOfBirth}
                 onChange={handleAddInputChange}
-                min="1950"
+                min="1900"
                 max={currentYear}
                 className={styles.formInput}
               />
@@ -358,8 +380,8 @@ export default function UserRoute() {
                 onChange={handleEditInputChange}
                 className={styles.formSelect}
               >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
               </select>
             </div>
             <div className={styles.formGroup}>
@@ -370,7 +392,7 @@ export default function UserRoute() {
                 name="yearOfBirth"
                 value={editUser.yearOfBirth}
                 onChange={handleEditInputChange}
-                min="1950"
+                min="1900"
                 max={currentYear}
                 className={styles.formInput}
               />
@@ -420,7 +442,7 @@ export default function UserRoute() {
                 <td className={styles.td}>{item.username}</td>
                 <td className={styles.td}>{item.email}</td>
                 <td className={styles.td}>
-                  <span className={`${styles.genderBadge} ${item.gender === 'Male' ? styles.male : styles.female}`}>
+                  <span className={`${styles.genderBadge} ${item.gender === 'male' ? styles.male : styles.female}`}>
                     {item.gender}
                   </span>
                 </td>
