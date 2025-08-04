@@ -15,7 +15,7 @@ export class TasksController {
 
   @Get(':task')
   findByTask(@Param('task') task: string): Promise<Task[]> {
-    return this.tasksService.findByTask(task);
+    return this.tasksService.findByStatus(task);
   }
 
   @Post()
