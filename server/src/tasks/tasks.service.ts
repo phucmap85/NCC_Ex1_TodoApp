@@ -112,14 +112,40 @@ export class TasksService {
     // Validate the task
     await this.taskVaidation(updateTaskDto);
 
-    // Update the task
-    const updateNumberOfTasks = async (userId: string, increment: number) => {
-      return await this.userModel.findByIdAndUpdate(
-        userId, { $inc: { numberOfTasks: increment } }, { new: true }
-      ).exec();
-    };
+    // Check if the user exists and matches the provided fields
+    for(const user of updateTaskDto['assignee']) {
+      try {
+        const userExists = await this.userModel.findById(user._id).exec();
+
+        if(userExists) {
+          for(const key in user) {
+            if(key.toString() === '_id' || key.toString() === '__v') continue;
+            if(key.toString() === 'numberOfTasks') continue;
+            
+            if(!userExists[key] || userExists[key].toString() !== user[key].toString()) {
+              throw new HttpException(`One or more assignee fields do not match`, 400);
+            }
+          }
+        } else {
+          throw new HttpException('One or more assignees not found', 404);
+        }
+      } catch (error) {
+        throw new HttpException('One or more assignees not found', 404);
+      }
+    }
     
+    // Update the task
     try {
+      const updateNumberOfTasks = async (userId: string, increment: number) => {
+        try {
+          return await this.userModel.findByIdAndUpdate(
+            userId, { $inc: { numberOfTasks: increment } }, { new: true }
+          ).exec();
+        } catch (error) {
+          throw new HttpException('One or more assignees not found', 404);
+        }
+      };
+
       const existingTask = await this.taskModel.findById(id).exec();
 
       if(existingTask) {

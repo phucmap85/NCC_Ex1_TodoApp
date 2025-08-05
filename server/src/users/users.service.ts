@@ -56,6 +56,9 @@ export class UsersService {
     if (!userDto['yearOfBirth']) {
       throw new HttpException('Year of birth is required', 400);
     }
+    if (typeof userDto['yearOfBirth'] !== 'number' || !Number.isInteger(userDto['yearOfBirth'])) {
+      throw new HttpException('Year of birth must be a valid integer', 400);
+    }
     if (userDto['yearOfBirth'] < 1900 || userDto['yearOfBirth'] > new Date().getFullYear()) {
       throw new HttpException('Year of birth must be a valid year', 400);
     }
@@ -64,8 +67,10 @@ export class UsersService {
     if (userDto['numberOfTasks'] === undefined || userDto['numberOfTasks'] === null) {
       throw new HttpException('Number of tasks is required', 400);
     }
-    if (typeof userDto['numberOfTasks'] !== 'number' || userDto['numberOfTasks'] < 0) {
-      throw new HttpException('Number of tasks must be a non-negative number', 400);
+    if (typeof userDto['numberOfTasks'] !== 'number' || 
+        !Number.isInteger(userDto['numberOfTasks']) || 
+        userDto['numberOfTasks'] < 0) {
+      throw new HttpException('Number of tasks must be a non-negative integer', 400);
     }
   }
 
