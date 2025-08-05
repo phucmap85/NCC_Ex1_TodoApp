@@ -3,7 +3,7 @@
 import React from "react";
 import styles from "./box.module.css";
 import Item from "../item/item.js";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const toastStyles = {

@@ -52,7 +52,7 @@ export default function UserRoute() {
     username: '',
     email: '',
     gender: 'male',
-    yearOfBirth: new Date().getFullYear() - 25
+    yearOfBirth: Number(new Date().getFullYear() - 25)
   });
   const [editUser, setEditUser] = useState({
     _id: null,
@@ -60,7 +60,7 @@ export default function UserRoute() {
     username: '',
     email: '',
     gender: 'male',
-    yearOfBirth: new Date().getFullYear() - 25,
+    yearOfBirth: Number(new Date().getFullYear() - 25),
     numberOfTasks: 0
   });
 
@@ -105,7 +105,7 @@ export default function UserRoute() {
       username: '',
       email: '',
       gender: 'male',
-      yearOfBirth: new Date().getFullYear() - 25
+      yearOfBirth: Number(new Date().getFullYear() - 25)
     });
   };
 
@@ -123,7 +123,7 @@ export default function UserRoute() {
       username: '',
       email: '',
       gender: 'male',
-      yearOfBirth: new Date().getFullYear() - 25,
+      yearOfBirth: Number(new Date().getFullYear() - 25),
       numberOfTasks: 0
     });
   };
@@ -146,6 +146,8 @@ export default function UserRoute() {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
+
+    newUser.yearOfBirth = Number(newUser.yearOfBirth);
 
     try {
       const response = await fetch("http://localhost:3001/users", {
@@ -176,12 +178,17 @@ export default function UserRoute() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
+    editUser.yearOfBirth = Number(editUser.yearOfBirth);
+    editUser.numberOfTasks = Number(editUser.numberOfTasks);
+
     try {
       const response = await fetch("http://localhost:3001/users/" + editUser._id, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editUser)
       });
+
+      console.log(typeof editUser.yearOfBirth);
 
       if(!response.ok) {
         const errorText = await response.json();

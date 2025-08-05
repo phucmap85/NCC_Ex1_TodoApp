@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./item.module.css";
 import { MdEdit, MdDelete } from "react-icons/md";
 import Modal from 'react-modal';
+import Select from 'react-select';
 
 const customStyles = {
   overlay: {
@@ -23,7 +24,7 @@ const customStyles = {
     maxWidth: '450px',
     width: '90%',
     maxHeight: '90vh',
-    overflow: 'auto'
+    overflow: 'visible'
   }
 };
 
@@ -75,13 +76,9 @@ export default function Item({ item, onDelete, onEdit }) {
     if(confirm("Do you want to delete this item?")) onDelete(item._id);
   }
 
-  const handleAssignee = (user) => {
-    setAssignee(prev => {
-      if (prev.map(tempPrev => tempPrev._id).includes(user._id)) {
-        return prev.filter(u => u._id !== user._id);
-      }
-      else return [...prev, user];
-    });
+  const handleAssignee = (selectedOptions) => {
+    const selectedUsers = selectedOptions ? selectedOptions.map(option => option.userData) : [];
+    setAssignee(selectedUsers);
   };
 
   const handleSave = () => {
@@ -161,30 +158,110 @@ export default function Item({ item, onDelete, onEdit }) {
               <label htmlFor="assignee" className={styles.label}>
                 Assign To ({assignee.length} selected)
               </label>
-              <div className={styles.userSelectionGrid}>
-                {users.map(user => (
-                  <label key={user._id} className={styles.userCheckboxLabel}>
-                    <input
-                      type="checkbox"
-                      checked={assignee.map(tempAssignee => tempAssignee._id).includes(user._id)}
-                      onChange={() => handleAssignee(user)}
-                      className={styles.userCheckbox}
-                    />
-                    <span className={styles.userCheckboxText}>{user.fullName}</span>
-                  </label>
-                ))}
-              </div>
-              {assignee.length > 0 && (
-                <div className={styles.selectedUsers}>
-                  <strong>Selected: </strong> 
-                  {assignee.map((user, index) => (
-                    <span key={user._id} className={styles.selectedUser}>
-                      {index > 0 && ", "}
-                      {user.fullName}
-                    </span>
-                  ))}
-                </div>
-              )}
+
+              <Select
+                isMulti
+                name="assignee"
+                options={users.map(user => ({
+                  value: user._id,
+                  label: `${user.fullName} (@${user.username})`,
+                  userData: user
+                }))}
+                value={assignee.map(user => ({
+                  value: user._id,
+                  label: `${user.fullName} (@${user.username})`,
+                  userData: user
+                }))}
+                onChange={handleAssignee}
+                isSearchable={true}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                placeholder="Select users to assign..."
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    minHeight: '40px',
+                    border: '2px solid #e9ecef',
+                    borderRadius: '6px',
+                    boxShadow: state.isFocused ? '0 0 0 3px rgba(52, 152, 219, 0.1)' : 'none',
+                    borderColor: state.isFocused ? '#3498db' : '#e9ecef',
+                    '&:hover': {
+                      borderColor: '#3498db'
+                    },
+                    cursor: 'text'
+                  }),
+                  multiValue: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#3498db',
+                    borderRadius: '4px',
+                    margin: '2px'
+                  }),
+                  multiValueLabel: (provided) => ({
+                    ...provided,
+                    color: 'white',
+                    fontWeight: '500',
+                    fontSize: '0.85rem',
+                    padding: '4px 8px'
+                  }),
+                  multiValueRemove: (provided) => ({
+                    ...provided,
+                    color: 'white',
+                    borderRadius: '0 4px 4px 0',
+                    '&:hover': {
+                      backgroundColor: '#2980b9',
+                      color: 'white'
+                    }
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    borderRadius: '6px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    border: '1px solid #e9ecef',
+                    marginTop: '4px',
+                    zIndex: 9999
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: state.isSelected ? '#3498db' : state.isFocused ? '#f8f9fa' : 'white',
+                    color: state.isSelected ? 'white' : '#2c3e50',
+                    padding: '10px 12px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    '&:active': {
+                      backgroundColor: '#3498db',
+                      color: 'white'
+                    }
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: '#6c757d',
+                    fontSize: '0.9rem'
+                  }),
+                  input: (provided) => ({
+                    ...provided,
+                    color: '#2c3e50',
+                    fontSize: '0.9rem'
+                  }),
+                  indicatorsContainer: (provided) => ({
+                    ...provided,
+                    padding: '0 8px'
+                  }),
+                  clearIndicator: (provided) => ({
+                    ...provided,
+                    color: '#6c757d',
+                    '&:hover': {
+                      color: '#495057'
+                    }
+                  }),
+                  dropdownIndicator: (provided) => ({
+                    ...provided,
+                    color: '#6c757d',
+                    '&:hover': {
+                      color: '#495057'
+                    }
+                  })
+                }}
+              />
             </div>
           </div>
 
@@ -214,7 +291,7 @@ export default function Item({ item, onDelete, onEdit }) {
               <span className={styles.assignee}>Assigned to:</span>
               <div className={styles.userTags}>
                 {item.assignee.map((user) => (
-                  <span key={user._id} className={styles.userTag}>{user.fullName}</span>
+                  <span key={user._id} className={styles.userTag}>{user.fullName} (@{user.username})</span>
                 ))}
               </div>
             </div>
